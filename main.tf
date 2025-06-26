@@ -9,17 +9,28 @@ terraform {
 provider "azurerm" {
   features {}
 }
+provider "azurerm" {
+  features {}
+}
 
 resource "azurerm_resource_group" "rg" {
-  name     = "rg-disk-test"
+  name     = "rg-cosmos-recreate"
   location = "East US"
 }
 
-resource "azurerm_managed_disk" "disk" {
-  name                 = "disk-recreate-test"
-  location             = azurerm_resource_group.rg.location
-  resource_group_name  = azurerm_resource_group.rg.name
-  storage_account_type = "Standard_LRS"
-  create_option        = "Empty"
-  disk_size_gb         = 10
+resource "azurerm_cosmosdb_account" "cosmos" {
+  name                = "cosmos-recreate-test"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  offer_type          = "Standard"
+  kind                = "GlobalDocumentDB"
+  consistency_policy {
+    consistency_level = "Session"
+  }
+  geo_location {
+    location          = azurerm_resource_group.rg.location
+    failover_priority = 0
+  }
+  throughput = 400  # This is ForceNew
 }
+
