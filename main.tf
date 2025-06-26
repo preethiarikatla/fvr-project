@@ -16,7 +16,7 @@ resource "azurerm_resource_group" "rg" {
   name     = "gopi-rg"
   location = "East US"
   tags = {
-    environment = "preethi"
+    environment = "preethii"
     owner       = "gopi"
   }
 }
