@@ -19,5 +19,6 @@ resource "azurerm_public_ip" "pip" {
   name                = "pip-recreate-test"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
-  public_ip_address_allocation = "Static"
+  allocation_method   = "Static"  # ✅ Correct field
+  sku                 = "Basic"
 }
