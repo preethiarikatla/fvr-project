@@ -15,6 +15,10 @@ provider "azurerm" {
 resource "azurerm_resource_group" "rg" {
   name     = "gopi-rg"
   location = "East US"
+  tags = {
+    environment = "dev"
+    owner       = "gopi"
+  }
 }
 
 # Virtual Network
