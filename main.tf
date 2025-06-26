@@ -11,14 +11,15 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "rg" {
-  name     = "rg-pip-test"
+  name     = "rg-disk-test"
   location = "East US"
 }
 
-resource "azurerm_public_ip" "pip" {
-  name                = "pip-recreate-test"
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
-  allocation_method   = "Static"  # ✅ Correct field
-  sku                 = "Basic"
+resource "azurerm_managed_disk" "disk" {
+  name                 = "disk-recreate-test"
+  location             = azurerm_resource_group.rg.location
+  resource_group_name  = azurerm_resource_group.rg.name
+  storage_account_type = "Standard_LRS"
+  create_option        = "Empty"
+  disk_size_gb         = 10
 }
