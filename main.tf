@@ -32,7 +32,7 @@ resource "azurerm_virtual_network" "vnet2" {
 # Peering from vnet-source to vnet-destination
 # Peering from vnet-source to vnet-destination
 resource "azurerm_virtual_network_peering" "vnet1_to_vnet2" {
-  name                      = "peer-vnet1-to-vnet2-gopi"  # Unique name
+  name                      = "peer-vnet1-to-vnet2-nani"  # Unique name
   resource_group_name       = azurerm_resource_group.example.name
   virtual_network_name      = azurerm_virtual_network.vnet1.name
   remote_virtual_network_id = azurerm_virtual_network.vnet2.id
