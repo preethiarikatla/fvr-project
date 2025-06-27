@@ -10,32 +10,32 @@ provider "azurerm" {
   features {}
 }
 
-resource "azurerm_resource_group" "rg" {
-  name     = "rg-cosmos-recreate"
+resource "azurerm_resource_group" "example" {
+  name     = "rg-test-peering"
   location = "East US"
 }
 
-resource "azurerm_cosmosdb_account" "cosmos" {
-  name                = "cosmosrecreatetestacct"  # must be globally unique
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  offer_type          = "Standard"
-  kind                = "GlobalDocumentDB"
-
-  consistency_policy {
-    consistency_level = "Session"
-  }
-
-  geo_location {
-    location          = azurerm_resource_group.rg.location
-    failover_priority = 0
-  }
+resource "azurerm_virtual_network" "vnet1" {
+  name                = "vnet-source"
+  address_space       = ["10.0.0.0/16"]
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
 }
 
-resource "azurerm_cosmosdb_sql_database" "db" {
-  name                = "testdb"
-  resource_group_name = azurerm_resource_group.rg.name
-  account_name        = azurerm_cosmosdb_account.cosmos.name
-  throughput          = 400  # 🔥 ForceNew field
+resource "azurerm_virtual_network" "vnet2" {
+  name                = "vnet-destination"
+  address_space       = ["10.1.0.0/16"]
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
 }
+
+resource "azurerm_virtual_network_peering" "peer" {
+  name                      = "peer-vnet2-to-vnet1"
+  resource_group_name       = azurerm_resource_group.example.name
+  virtual_network_name      = azurerm_virtual_network.vnet1.name
+  remote_virtual_network_id = azurerm_virtual_network.vnet2.id
+  allow_forwarded_traffic   = true
+  allow_virtual_network_access = true
+}
+
 
