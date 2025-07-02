@@ -46,7 +46,7 @@ resource "azurerm_public_ip" "pip" {
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   allocation_method   = "Static"
-  domain_name_label   = "example-pip-test123"  # editable in portal
+  domain_name_label   = "example-pip-test1234"  # editable in portal
 }
 
 resource "azurerm_key_vault" "kv" {
