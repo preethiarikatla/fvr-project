@@ -58,7 +58,7 @@ resource "azurerm_key_vault" "kv" {
 
   # soft string reference — no direct dependency
   tags = {
-    dns_ref = "example-pip-test1234"
+    dns_ref = azurerm_public_ip.pip.domain_name_label
   }
 
   depends_on = [azurerm_public_ip.pip]
