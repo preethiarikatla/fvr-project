@@ -41,13 +41,14 @@ resource "azurerm_virtual_network_peering" "vnet1_to_vnet2" {
   use_remote_gateways           = false
 }
 
-resource "azurerm_public_ip" "pip" {
-  name                = "pip-test"
+resource "azurerm_public_ip" "example" {
+  name                = "public-ip-example"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   allocation_method   = "Static"
-  domain_name_label   = "mylabel-${random_id.suffix.hex}"  # Ensures uniqueness
+  domain_name_label   = "unique-label-123"
 }
+
 
 
 
