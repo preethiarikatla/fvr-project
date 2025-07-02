@@ -41,21 +41,31 @@ resource "azurerm_virtual_network_peering" "vnet1_to_vnet2" {
   use_remote_gateways           = false
 }
 
-resource "azurerm_key_vault" "example" {
-  name                        = "keyvault-${random_id.suffix.hex}"
-  location                    = azurerm_resource_group.example.location
-  resource_group_name         = azurerm_resource_group.example.name
+resource "azurerm_public_ip" "pip" {
+  name                = "pip-for-dependency"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  allocation_method   = "Static"
+  domain_name_label   = "example-pip-test123"  # editable in portal
+}
+
+resource "azurerm_key_vault" "kv" {
+  name                        = "kv-dependency-test123"
+  location                    = azurerm_resource_group.rg.location
+  resource_group_name         = azurerm_resource_group.rg.name
   tenant_id                   = data.azurerm_client_config.current.tenant_id
   sku_name                    = "standard"
 
-  enabled_for_deployment = true
-}
+  # soft string reference — no direct dependency
+  tags = {
+    dns_ref = azurerm_public_ip.pip.domain_name_label
+  }
 
-resource "random_id" "suffix" {
-  byte_length = 4
+  depends_on = [azurerm_public_ip.pip]
 }
 
 data "azurerm_client_config" "current" {}
+
 
 
 
