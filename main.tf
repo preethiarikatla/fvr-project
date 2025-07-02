@@ -41,13 +41,21 @@ resource "azurerm_virtual_network_peering" "vnet1_to_vnet2" {
   use_remote_gateways           = false
 }
 
-resource "azurerm_public_ip" "example" {
-  name                = "public-ip-example"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
-  allocation_method   = "Static"
-  domain_name_label   = "unique-label-123"
+resource "azurerm_key_vault" "example" {
+  name                        = "keyvault-${random_id.suffix.hex}"
+  location                    = azurerm_resource_group.example.location
+  resource_group_name         = azurerm_resource_group.example.name
+  tenant_id                   = data.azurerm_client_config.current.tenant_id
+  sku_name                    = "standard"
+
+  enabled_for_deployment = true
 }
+
+resource "random_id" "suffix" {
+  byte_length = 4
+}
+
+data "azurerm_client_config" "current" {}
 
 
 
