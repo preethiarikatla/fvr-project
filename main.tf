@@ -41,15 +41,14 @@ resource "azurerm_virtual_network_peering" "vnet1_to_vnet2" {
   use_remote_gateways           = false
 }
 
-# Cognitive Deployment with optional + computed field
-resource "azurerm_cognitive_deployment" "example" {
-  name                = "cognitive-deploy-test"
-  resource_group_name = azurerm_resource_group.example.name
+resource "azurerm_public_ip" "pip" {
+  name                = "pip-test"
   location            = azurerm_resource_group.example.location
-  cognitive_account_id = azurerm_cognitive_account.example.id
-
-  version_upgrade_option = "OnceNewDefaultVersionAvailable" # Optional + Computed
+  resource_group_name = azurerm_resource_group.example.name
+  allocation_method   = "Static"
+  domain_name_label   = "mycustomlabel"  # optional + computed
 }
+
 
 
 
