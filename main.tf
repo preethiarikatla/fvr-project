@@ -43,16 +43,16 @@ resource "azurerm_virtual_network_peering" "vnet1_to_vnet2" {
 
 resource "azurerm_public_ip" "pip" {
   name                = "pip-for-dependency"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
   allocation_method   = "Static"
   domain_name_label   = "example-pip-test123"  # editable in portal
 }
 
 resource "azurerm_key_vault" "kv" {
   name                        = "kv-dependency-test123"
-  location                    = azurerm_resource_group.rg.location
-  resource_group_name         = azurerm_resource_group.rg.name
+  location                    = azurerm_resource_group.example.location
+  resource_group_name         = azurerm_resource_group.example.name
   tenant_id                   = data.azurerm_client_config.current.tenant_id
   sku_name                    = "standard"
 
