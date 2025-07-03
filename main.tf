@@ -11,66 +11,59 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "example" {
-  name     = "rg-test-peering"
+  name     = "rg-ignore-test"
   location = "East US"
 }
 
-resource "azurerm_virtual_network" "vnet1" {
-  name                = "vnet-source"
+resource "azurerm_virtual_network" "vnet" {
+  name                = "vnet-ignore-test"
   address_space       = ["10.0.0.0/16"]
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 }
 
-resource "azurerm_virtual_network" "vnet2" {
-  name                = "vnet-destination"
-  address_space       = ["10.1.0.0/16"]
+resource "azurerm_subnet" "gateway" {
+  name                 = "GatewaySubnet"
+  resource_group_name  = azurerm_resource_group.example.name
+  virtual_network_name = azurerm_virtual_network.vnet.name
+  address_prefixes     = ["10.0.1.0/24"]
+}
+
+resource "azurerm_public_ip" "example" {
+  name                = "pip-ignore-test"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
+  allocation_method   = "Dynamic"
+  sku                 = "Basic"
 }
 
-# Peering from vnet-source to vnet-destination
-resource "azurerm_virtual_network_peering" "vnet1_to_vnet2" {
-  name                          = "peer-vnet1-to-vnet2-nani"
-  resource_group_name           = azurerm_resource_group.example.name
-  virtual_network_name          = azurerm_virtual_network.vnet1.name
-  remote_virtual_network_id     = azurerm_virtual_network.vnet2.id
-  allow_virtual_network_access  = true
-  allow_forwarded_traffic       = true
-  allow_gateway_transit         = false
-  use_remote_gateways           = false
-}
-
-resource "azurerm_public_ip" "pip" {
-  name                = "pip-for-dependency"
+resource "azurerm_virtual_network_gateway" "example" {
+  name                = "vng-ignore-test"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
-  allocation_method   = "Static"
-  domain_name_label   = "example-pip-test1234"  # editable in portal
-}
+  type                = "Vpn"
+  vpn_type            = "RouteBased"
+  active_active       = false
+  enable_bgp          = false
+  sku                 = "VpnGw1"
 
-resource "azurerm_key_vault" "kv" {
-  name                        = "kv-dependency-test123"
-  location                    = azurerm_resource_group.example.location
-  resource_group_name         = azurerm_resource_group.example.name
-  tenant_id                   = data.azurerm_client_config.current.tenant_id
-  sku_name                    = "standard"
-
-  # soft string reference — no direct dependency
-  tags = {
-    dns_ref = azurerm_public_ip.pip.domain_name_label
+  ip_configuration {
+    name                          = "vng-ipconfig-test"
+    public_ip_address_id          = azurerm_public_ip.example.id
+    private_ip_address_allocation = "Dynamic"
+    subnet_id                     = azurerm_subnet.gateway.id
   }
 
-  depends_on = [azurerm_public_ip.pip]
+  tags = {
+    env = "test"
+  }
+
+  lifecycle {
+    ignore_changes = [
+      tags,                      # top-level
+      ip_configuration[0].name  # nested block
+    ]
+  }
 }
-
-data "azurerm_client_config" "current" {}
-
-
-
-
-
-
-
 
 
