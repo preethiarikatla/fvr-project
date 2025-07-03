@@ -16,25 +16,27 @@ resource "azurerm_resource_group" "example" {
 }
 
 resource "azurerm_storage_account" "example" {
-  name                     = "ignoreteststorage123"
+  name                     = "ignorestoragetest123"
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
 
   tags = {
-    environment = "test"
+    environment = "dev"
   }
 
-  custom_domain {
-    name          = "www.example.com"
-    use_subdomain = false
+  network_rules {
+    default_action             = "Allow"
+    bypass                     = ["AzureServices"]
+    ip_rules                   = []
+    virtual_network_subnet_ids = []
   }
 
   lifecycle {
     ignore_changes = [
-      tags,                  # top-level attribute
-      custom_domain[0].name  # nested block
+      tags,                      # top-level field
+      network_rules[0].bypass    # nested block attribute
     ]
   }
 }
