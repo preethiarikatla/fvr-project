@@ -11,59 +11,66 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "example" {
-  name     = "rg-ignore-test"
+  name     = "rg-ignore-appgw"
   location = "East US"
 }
 
-resource "azurerm_virtual_network" "vnet" {
-  name                = "vnet-ignore-test"
+resource "azurerm_virtual_network" "example" {
+  name                = "vnet-ignore-appgw"
   address_space       = ["10.0.0.0/16"]
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 }
 
-resource "azurerm_subnet" "gateway" {
-  name                 = "GatewaySubnet"
+resource "azurerm_subnet" "example" {
+  name                 = "subnet-appgw"
   resource_group_name  = azurerm_resource_group.example.name
-  virtual_network_name = azurerm_virtual_network.vnet.name
+  virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.0.1.0/24"]
 }
 
 resource "azurerm_public_ip" "example" {
-  name                = "pip-ignore-test"
+  name                = "pip-ignore-appgw"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
-  allocation_method   = "Dynamic"
-  sku                 = "Basic"
+  allocation_method   = "Static"
+  sku                 = "Standard"
 }
 
-resource "azurerm_virtual_network_gateway" "example" {
-  name                = "vng-ignore-test"
+resource "azurerm_application_gateway" "example" {
+  name                = "appgw-ignore-test"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
-  type                = "Vpn"
-  vpn_type            = "RouteBased"
-  active_active       = false
-  enable_bgp          = false
-  sku                 = "VpnGw1"
 
-  ip_configuration {
-    name                          = "vng-ipconfig-test"
-    public_ip_address_id          = azurerm_public_ip.example.id
-    private_ip_address_allocation = "Dynamic"
-    subnet_id                     = azurerm_subnet.gateway.id
+  sku {
+    name     = "Standard_v2"
+    tier     = "Standard_v2"
+    capacity = 1
+  }
+
+  gateway_ip_configuration {
+    name      = "appgw-ip-config"
+    subnet_id = azurerm_subnet.example.id
+  }
+
+  frontend_port {
+    name = "frontend-port"
+    port = 80
+  }
+
+  frontend_ip_configuration {
+    name                 = "appgw-fe-ip"
+    public_ip_address_id = azurerm_public_ip.example.id
   }
 
   tags = {
-    env = "test"
+    environment = "dev"
   }
 
   lifecycle {
     ignore_changes = [
-      tags,                      # top-level
-      ip_configuration[0].name  # nested block
+      tags,                               # top-level
+      frontend_ip_configuration[0].name   # nested block
     ]
   }
 }
-
-
