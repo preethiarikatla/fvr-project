@@ -11,29 +11,37 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "example" {
-  name     = "rg-ignore-test"
+  name     = "rg-ignore-test1"
   location = "East US"
 }
 
-resource "azurerm_app_configuration" "example" {
-  name                = "example-appconfig"
+resource "azurerm_application_gateway" "example" {
+  name                = "example-appgw"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
-  sku                 = "standard"
-
-  identity {
-    type = "SystemAssigned"
+  sku {
+    name     = "Standard_v2"
+    tier     = "Standard_v2"
+    capacity = 2
   }
 
-  tags = {
-    environment = "dev"
+  frontend_port {
+    name = "frontendPort1"
+    port = 80
   }
 
-lifecycle {
-  ignore_changes = [
-   name,
-   tags.environment
-  ]
-}
+  http_listener {
+    name                           = "listener1"
+    frontend_ip_configuration_name = "frontendConfig1"
+    frontend_port_name             = "frontendPort1"
+    protocol                       = "Http"
+  }
+
+  lifecycle {
+    ignore_changes = [
+      name,
+      http_listener[0].name
+    ]
+  }
 }
 
