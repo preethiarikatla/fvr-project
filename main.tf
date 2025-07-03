@@ -10,38 +10,40 @@ provider "azurerm" {
   features {}
 }
 
+provider "azurerm" {
+  features {}
+}
+
 resource "azurerm_resource_group" "example" {
-  name     = "rg-ignore-test1"
+  name     = "rg-ignore-test"
   location = "East US"
 }
 
-resource "azurerm_application_gateway" "example" {
-  name                = "example-appgw"
+resource "azurerm_network_security_group" "example" {
+  name                = "nsg-ignore-test"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
-  sku {
-    name     = "Standard_v2"
-    tier     = "Standard_v2"
-    capacity = 2
+
+  security_rule {
+    name                       = "AllowSSH"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
   }
 
-  frontend_port {
-    name = "frontendPort1"
-    port = 80
-  }
-
-  http_listener {
-    name                           = "listener1"
-    frontend_ip_configuration_name = "frontendConfig1"
-    frontend_port_name             = "frontendPort1"
-    protocol                       = "Http"
+  tags = {
+    environment = "test"
   }
 
   lifecycle {
     ignore_changes = [
-      name,
-      http_listener[0].name
+      name,                        # top-level
+      security_rule[0].name  # nested
     ]
   }
 }
-
