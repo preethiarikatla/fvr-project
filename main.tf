@@ -33,10 +33,10 @@ resource "azurerm_storage_account" "example" {
     virtual_network_subnet_ids = []
   }
 
-  lifecycle {
-    ignore_changes = [
-      tags,                      # top-level field
-      network_rules[0].bypass    # nested block attribute
-    ]
-  }
+lifecycle {
+  ignore_changes = [
+    network_rules,
+    routing_preference
+  ]
+}
 }
