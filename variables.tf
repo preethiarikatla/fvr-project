@@ -6,5 +6,6 @@ variable "vnet_rg" {
   default = "Preethi"
 }
 variable "pree" {
- name = peer-vnet1-to-vnet2
+  type    = string
+  default = "peer-vnet1-to-vnet2"
 }
