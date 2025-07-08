@@ -15,31 +15,52 @@ resource "azurerm_resource_group" "example" {
   location = "East US"
 }
 
-resource "azurerm_network_security_group" "example" {
-  name                = "nsg-ignore-test"
+esource "azurerm_resource_group" "example" {
+  name     = "rg-test-peering"
+  location = "East US"
+}
+
+resource "azurerm_virtual_network" "vnet1" {
+  name                = "vnet-source"
+  address_space       = ["10.0.0.0/16"]
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+}
+
+resource "azurerm_virtual_network" "vnet2" {
+  name                = "vnet-destination"
+  address_space       = ["10.1.0.0/16"]
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+}
+
+resource "azurerm_virtual_network_peering" "vnet1_to_vnet2" {
+  name                          = "peer-vnet1-to-vnet2"
+  resource_group_name           = azurerm_resource_group.example.name
+  virtual_network_name          = azurerm_virtual_network.vnet1.name
+  remote_virtual_network_id     = azurerm_virtual_network.vnet2.id
+  allow_virtual_network_access  = true
+  allow_forwarded_traffic       = true
+  allow_gateway_transit         = false
+  use_remote_gateways           = false
+}
+
+resource "azurerm_network_security_group" "nsg" {
+  name                = "nsg-peering-dependent"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
 
   security_rule {
-    name                       = "AllowSSH"
+    name                       = "Allow-Internal-Peering"
     priority                   = 100
     direction                  = "Inbound"
     access                     = "Allow"
-    protocol                   = "Tcp"
+    protocol                   = "*"
     source_port_range          = "*"
-    destination_port_range     = "22"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = azurerm_virtual_network.vnet2.address_space[0]
+    destination_address_prefix = azurerm_virtual_network.vnet1.address_space[0]
   }
 
-  tags = {
-    environment = "test"
-  }
-
-  lifecycle {
-    ignore_changes = [
-      name,                        # top-level
-      security_rule[0].name  # nested
-    ]
-  }
+  depends_on = [azurerm_virtual_network_peering.vnet1_to_vnet2]
 }
