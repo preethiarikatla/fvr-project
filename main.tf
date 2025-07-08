@@ -53,8 +53,8 @@ resource "azurerm_network_security_group" "nsg" {
     protocol                   = "*"
     source_port_range          = "*"
     destination_port_range     = "*"
-    source_address_prefix      = azurerm_virtual_network.vnet2.address_space[0]
-    destination_address_prefix = azurerm_virtual_network.vnet1.address_space[0]
+    source_address_prefix      = tolist(azurerm_virtual_network.vnet2.address_space)[0]
+    destination_address_prefix = tolist(azurerm_virtual_network.vnet1.address_space)[0]
   }
 
   depends_on = [azurerm_virtual_network_peering.vnet1_to_vnet2]
