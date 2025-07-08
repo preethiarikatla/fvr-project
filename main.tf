@@ -15,11 +15,6 @@ resource "azurerm_resource_group" "example" {
   location = "East US"
 }
 
-resource "azurerm_resource_group" "example" {
-  name     = "rg-test-peering"
-  location = "East US"
-}
-
 resource "azurerm_virtual_network" "vnet1" {
   name                = "vnet-source"
   address_space       = ["10.0.0.0/16"]
