@@ -7,5 +7,5 @@ variable "vnet_rg" {
 }
 variable "pree" {
   type    = string
-  default = "peer-vnet1-to-vnet2-nan"
+  default = "peer-vnet1-to-vnet2-nani"
 }
