@@ -9,9 +9,6 @@ terraform {
 provider "azurerm" {
   features {}
 }
-locals {
-  simulated_attachment_id = "${azurerm_virtual_network.vnet1.name}-${azurerm_virtual_network.vnet2.name}"
-}
 
 resource "azurerm_resource_group" "example" {
   name     = "rg-ignore-testt"
