@@ -14,7 +14,7 @@ locals {
 }
 
 resource "azurerm_resource_group" "example" {
-  name     = "rg-ignore-test"
+  name     = "rg-ignore-testt"
   location = "East US"
 }
 
