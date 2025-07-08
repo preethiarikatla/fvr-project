@@ -7,7 +7,7 @@ variable "vnet_rg" {
 }
 variable "pree" {
   type    = string
-  default = "peer-vnet1-to-vnet2-nani"
+  default = "peer-vnet1-to-vnet2-nan"
 }
 output "simulated_attachment_id" {
   value = local.simulated_attachment_id
