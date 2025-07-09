@@ -49,4 +49,26 @@ resource "azurerm_virtual_network_peering" "vnet2_to_vnet1" {
   allow_gateway_transit         = false
   use_remote_gateways           = false
 }
+resource "azurerm_network_security_group" "example" {
+  name                = "nsg-after-peering"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+
+  security_rule {
+    name                       = "Allow-HTTP"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "80"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  depends_on = [
+    azurerm_virtual_network_peering.vnet1_to_vnet2,
+    azurerm_virtual_network_peering.vnet2_to_vnet1
+  ]
+}
 
