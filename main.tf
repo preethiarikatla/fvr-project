@@ -67,8 +67,8 @@ resource "azurerm_network_security_group" "example" {
   }
 
   depends_on = [
-    azurerm_virtual_network_peering.vnet1_to_vnet2_new,
-    azurerm_virtual_network_peering.vnet2_to_vnet1_new
+    azurerm_virtual_network_peering.vnet1_to_vnet2,
+    azurerm_virtual_network_peering.vnet2_to_vnet1
   ]
 }
 #hi
