@@ -30,7 +30,7 @@ resource "azurerm_virtual_network" "vnet2" {
 }
 
 resource "azurerm_virtual_network_peering" "vnet1_to_vnet2_ne" {
-  name                          = "peer-vnet1-to-vnet2-nani"
+  name                          = "peer-vnet1-to-vnet2-nan"
   resource_group_name           = azurerm_resource_group.example.name
   virtual_network_name          = azurerm_virtual_network.vnet1.name
   remote_virtual_network_id     = azurerm_virtual_network.vnet2.id
@@ -40,7 +40,7 @@ resource "azurerm_virtual_network_peering" "vnet1_to_vnet2_ne" {
   use_remote_gateways           = false
 }
 resource "azurerm_virtual_network_peering" "vnet2_to_vnet1_ne" {
-  name                          = "peer-vnet1-to-vnet2-nani"
+  name                          = "peer-vnet1-to-vnet2-nan"
   resource_group_name           = azurerm_resource_group.example.name
   virtual_network_name          = azurerm_virtual_network.vnet2.name
   remote_virtual_network_id     = azurerm_virtual_network.vnet1.id
