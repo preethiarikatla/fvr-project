@@ -19,11 +19,11 @@ resource "azurerm_resource_group" "exam" {
   location = "eastus2"
   tags     = null
 
-  lifecycle {
-    ignore_changes = [
-      tags
-    ]
-  }
+  #lifecycle {
+  #  ignore_changes = [
+  #    tags
+  #  ]
+  #}
 }
 resource "azurerm_virtual_network" "vnet1" {
   name                = "vnet-source"
