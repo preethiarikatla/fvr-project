@@ -16,7 +16,7 @@ resource "azurerm_resource_group" "example" {
 }
 resource "azurerm_resource_group" "exam" {
   name     = "pree"
-  location = "East US"
+  location = "eastus2"
 
   lifecycle {
     ignore_changes = [
