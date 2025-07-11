@@ -14,9 +14,15 @@ resource "azurerm_resource_group" "example" {
   name     = "rg-ignore-testt"
   location = "East US"
 }
-resource "azurerm_resource_group" "exam"{
-  name = "pree"
+resource "azurerm_resource_group" "exam" {
+  name     = "pree"
   location = "East US"
+
+  lifecycle {
+    ignore_changes = [
+      tags
+    ]
+  }
 }
 resource "azurerm_virtual_network" "vnet1" {
   name                = "vnet-source"
