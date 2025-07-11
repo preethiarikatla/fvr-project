@@ -21,7 +21,7 @@ resource "azurerm_resource_group" "exam" {
 
   lifecycle {
     ignore_changes = [
-      tags
+      tags,
       location
     ]
   }
