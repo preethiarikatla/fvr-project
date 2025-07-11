@@ -16,12 +16,13 @@ resource "azurerm_resource_group" "example" {
 }
 resource "azurerm_resource_group" "exam" {
   name     = "pree"
-  location = "eastus2"
-  #tags     = null
+  location = "eastus"
+  tags     = null
 
   lifecycle {
     ignore_changes = [
       tags
+      location
     ]
   }
 }
