@@ -1,4 +1,4 @@
-terraform {
+sorterraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
@@ -14,7 +14,10 @@ resource "azurerm_resource_group" "example" {
   name     = "rg-ignore-testt"
   location = "East US"
 }
-
+resource "azurerm_resource_group" "exam"{
+  name = "pree"
+  location = "East US"
+}
 resource "azurerm_virtual_network" "vnet1" {
   name                = "vnet-source"
   address_space       = ["10.0.0.0/16"]
