@@ -143,8 +143,8 @@ resource "azurerm_linux_virtual_machine" "vm_v2" {
   location                        = azurerm_resource_group.rg.location
   resource_group_name             = azurerm_resource_group.rg.name
   size                            = "Standard_B1s"
-  network_interface_ids           = [azurerm_network_interface.nic_v2.id]
-  #network_interface_ids           = [azurerm_network_interface.nic.id]
+  #network_interface_ids           = [azurerm_network_interface.nic_v2.id]
+  network_interface_ids           = [azurerm_network_interface.nic.id]
   admin_username                  = "azureuser"
   disable_password_authentication = true
 
