@@ -51,10 +51,10 @@ resource "azurerm_linux_virtual_machine" "vm" {
   disable_password_authentication = true
 
   # 👇 Required dummy key – no login needed
-  admin_ssh_key {
-    username   = "azureuser"
-    public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDdummy12345testgenerated" # dummy value
-  }
+admin_ssh_key {
+  username   = "azureuser"
+  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC5eCB7LvG5hP4g4L3NgGmYFevRzZvzwu+9o1b0dYcC9N3oHdRsmgDHcJbVf6Za1KjM2nM0k4XzvVeZB4AfRZoUZnHd8NhxY9z+j8PRFJ+5xJ9MEiVZTi9t+6cfOjWkQaF5Qv6KUPy0JmcEZ2AKu0tEpFzU2RQGubFDE3V9eUvmjZtNz test@example.com"
+}
 
   source_image_reference {
     publisher = "Canonical"
