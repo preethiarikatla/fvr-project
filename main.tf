@@ -114,12 +114,4 @@ resource "azurerm_linux_virtual_machine" "vm" {
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
-
-  # 👇 Cloud-init script to immediately shut down the VM after first boot
-  custom_data = base64encode(<<EOF
-#cloud-config
-runcmd:
-  - shutdown -h now
-EOF
-  )
 }
