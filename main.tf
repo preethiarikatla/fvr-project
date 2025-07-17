@@ -115,6 +115,9 @@ resource "azurerm_linux_virtual_machine" "vm" {
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
+  lifecycle {
+    prevent_destroy = true  # 👈 Ensures it won’t be deleted from Azure
+  }
 }
 # New NIC for the new VM
 resource "azurerm_network_interface" "nic_v2" {
