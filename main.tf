@@ -10,76 +10,61 @@ provider "azurerm" {
   features {}
 }
 
-resource "azurerm_resource_group" "example" {
-  name     = "rg-ignore-testt"
+resource "azurerm_resource_group" "rg" {
+  name     = "vm-no-login-rg"
   location = "East US"
 }
-resource "azurerm_resource_group" "exam" {
-  name     = "pree"
-  location = "eastus"
-  #tags     = null
 
-  lifecycle {
-    ignore_changes = [
-      tags,
-      location
-    ]
-  }
-}
-resource "azurerm_virtual_network" "vnet1" {
-  name                = "vnet-source"
+resource "azurerm_virtual_network" "vnet" {
+  name                = "vm-vnet"
   address_space       = ["10.0.0.0/16"]
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
 }
 
-resource "azurerm_virtual_network" "vnet2" {
-  name                = "vnet-destination"
-  address_space       = ["10.1.0.0/16"]
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
+resource "azurerm_subnet" "subnet" {
+  name                 = "vm-subnet"
+  resource_group_name  = azurerm_resource_group.rg.name
+  virtual_network_name = azurerm_virtual_network.vnet.name
+  address_prefixes     = ["10.0.1.0/24"]
 }
 
-resource "azurerm_virtual_network_peering" "vnet1_to_vnet2" {
-  name                          = "peer-vnet1-to-vnet2-nan"
-  resource_group_name           = azurerm_resource_group.example.name
-  virtual_network_name          = azurerm_virtual_network.vnet1.name
-  remote_virtual_network_id     = azurerm_virtual_network.vnet2.id
-  allow_virtual_network_access  = true
-  allow_forwarded_traffic       = true
-  allow_gateway_transit         = false
-  use_remote_gateways           = false
-}
-resource "azurerm_virtual_network_peering" "vnet2_to_vnet1" {
-  name                          = "peer-vnet1-to-vnet2-nan"
-  resource_group_name           = azurerm_resource_group.example.name
-  virtual_network_name          = azurerm_virtual_network.vnet2.name
-  remote_virtual_network_id     = azurerm_virtual_network.vnet1.id
-  allow_virtual_network_access  = true
-  allow_forwarded_traffic       = true
-  allow_gateway_transit         = false
-  use_remote_gateways           = false
-}
-resource "azurerm_network_security_group" "example" {
-  name                = "nsg-after-peering"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
+resource "azurerm_network_interface" "nic" {
+  name                = "vm-nic"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
 
-  security_rule {
-    name                       = "Allow-HTTP"
-    priority                   = 100
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "80"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = azurerm_subnet.subnet.id
+    private_ip_address_allocation = "Dynamic"
+  }
+}
+
+resource "azurerm_linux_virtual_machine" "vm" {
+  name                            = "test-vm"
+  location                        = azurerm_resource_group.rg.location
+  resource_group_name             = azurerm_resource_group.rg.name
+  size                            = "Standard_B1s"
+  network_interface_ids           = [azurerm_network_interface.nic.id]
+  admin_username                  = "azureuser"
+  disable_password_authentication = true
+
+  # 👇 Required dummy key – no login needed
+  admin_ssh_key {
+    username   = "azureuser"
+    public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDdummy12345testgenerated" # dummy value
   }
 
-  depends_on = [
-    azurerm_virtual_network_peering.vnet1_to_vnet2,
-    azurerm_virtual_network_peering.vnet2_to_vnet1
-  ]
-}
-#hi
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "18.04-LTS"
+    version   = "18.04.202403130"  # ⬅️ change to test replacement
+  }
+
+  os_disk {
+    name                 = "test-osdisk"
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
