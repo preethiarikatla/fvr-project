@@ -171,11 +171,5 @@ resource "azurerm_linux_virtual_machine" "vm_v2" {
     caching              = "ReadWrite"
     storage_account_type = "Standard_LRS"
   }
-  custom_data = base64encode(<<EOF
-#cloud-config
-runcmd:
-  - shutdown -h now
-EOF
-  )
 }
 
