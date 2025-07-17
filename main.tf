@@ -58,8 +58,8 @@ admin_ssh_key {
 source_image_reference {
   publisher = "Canonical"
   offer     = "UbuntuServer"
-  sku       = "18.04-LTS"
-  version   = "18.04.202406100"
+  sku       = "20_04-lts"
+  version   = "latest"
 }
 
   os_disk {
