@@ -53,7 +53,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
   # 👇 Required dummy key – no login needed
 admin_ssh_key {
   username   = "azureuser"
-  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC5eCB7LvG5hP4g4L3NgGmYFevRzZvzwu+9o1b0dYcC9N3oHdRsmgDHcJbVf6Za1KjM2nM0k4XzvVeZB4AfRZoUZnHd8NhxY9z+j8PRFJ+5xJ9MEiVZTi9t+6cfOjWkQaF5Qv6KUPy0JmcEZ2AKu0tEpFzU2RQGubFDE3V9eUvmjZtNz test@example.com"
+  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDRJaB9f+o1bWUQFfigorqJVfcLNKX2Ox29MtvqyPgMz4D/WuSpa09nIbgp195vuqLbHiGG0gV2WNQab1MOLbI8xSm9wLNyX0Srm4+jwWXylHpjflm3L1QnceQANnt2LVqr7h2mSMubytDxKhImOnSXejgylyVp+nFV0624lHuyJXDNHZl+RXC0giEE1Iujz3Mu2lyZ1DkWAYzAbvvZfu8jOVuSk8hdpjZn6k0jvMkBGbCNxyg18SM/TSgx5X5Mwszjbx2dU1tNpXfW87XcvRn9zVE7Asw196YoZHx2yRadEf1KCv+vJxW/6Pwu1V7Uqg4k2t58rJ46217l39ZlKUJ9 preethi@SandboxHost-638883515602013682"
 }
 
   source_image_reference {
