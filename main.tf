@@ -138,7 +138,7 @@ resource "azurerm_linux_virtual_machine" "vm_v2" {
   size                            = "Standard_B1s"
   #network_interface_ids           = [azurerm_network_interface.nic_v2.id]
   network_interface_ids           = [azurerm_network_interface.nic.id]
-  admin_username                  = azurerm_linux_virtual_machine.vm.admin_username
+  admin_username                  = "azureuser"
   disable_password_authentication = true
 
   admin_ssh_key {
@@ -159,10 +159,4 @@ resource "azurerm_linux_virtual_machine" "vm_v2" {
     storage_account_type = "Standard_LRS"
   }
 
-  custom_data = base64encode(<<EOF
-#cloud-config
-runcmd:
-  - shutdown -h now
-EOF
-  )
 }
