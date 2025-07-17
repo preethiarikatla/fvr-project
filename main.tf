@@ -109,7 +109,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
     publisher = "Canonical"
     offer     = "UbuntuServer"
     sku       = "18.04-LTS"
-    version   = "18.04.202406100" # Change to test replacement
+    version   = "latest"
   }
 
   os_disk {
