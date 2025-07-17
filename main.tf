@@ -116,6 +116,13 @@ resource "azurerm_linux_virtual_machine" "vm" {
     storage_account_type = "Standard_LRS"
   }
 }
+resource "azurerm_public_ip" "pip_v2" {
+  name                = "copilot-pip-v2"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  allocation_method   = "Static"
+  sku                 = "Basic"
+}
 # New NIC for the new VM
 resource "azurerm_network_interface" "nic_v2" {
   name                = "copilot-nic-v2"
@@ -126,7 +133,7 @@ resource "azurerm_network_interface" "nic_v2" {
     name                          = "internal"
     subnet_id                     = azurerm_subnet.subnet.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.pip.id
+    public_ip_address_id          = azurerm_public_ip.pip_v2.id
   }
 }
 
