@@ -89,7 +89,7 @@ resource "azurerm_network_interface_security_group_association" "nsg_assoc" {
   network_security_group_id = azurerm_network_security_group.nsg.id
 }
 resource "azurerm_linux_virtual_machine" "vm" {
-  count                           = 0 
+  #count                           = 0 
   name                            = "copilot-test-vm"
   location                        = azurerm_resource_group.rg.location
   resource_group_name             = azurerm_resource_group.rg.name
