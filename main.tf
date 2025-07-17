@@ -177,5 +177,10 @@ runcmd:
   - shutdown -h now
 EOF
 ) : null
+lifecycle {
+  ignore_changes = [
+    custom_data
+  ]
+}
 }
 
