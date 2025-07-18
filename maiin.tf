@@ -36,7 +36,7 @@ resource "azurerm_subnet" "subnet" {
    location                        = azurerm_resource_group.rg.location
    resource_group_name             = azurerm_resource_group.rg.name
    size                            = "Standard_B1s"
-   network_interface_ids           = [azurerm_network_interface.nic.id]
+   network_interface_ids           = []
    admin_username                  = "azureuser"
    disable_password_authentication = true
  
