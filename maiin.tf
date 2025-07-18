@@ -44,8 +44,8 @@ data "azurerm_public_ip" "reserved_ip" {
 # Step 3: Update the NIC to use static public IP
 resource "azurerm_network_interface" "nic_update" {
   name                = data.azurerm_network_interface.existing_nic.name
-  location            = var.location
-  resource_group_name = var.resource_group_name
+  location            = "East US"
+  resource_group_name = azurerm_resource_group.rg.name
 
   ip_configuration {
     name                          = data.azurerm_network_interface.existing_nic.ip_configuration[0].name
