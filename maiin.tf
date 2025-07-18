@@ -15,10 +15,6 @@ resource "azurerm_resource_group" "rg" {
   name     = "pree"
   location = "East US"
 }
-resource "azurerm_resource_group" "rg" {
-  name     = "test-nic-vm-rg"
-  location = "eastus"
-}
 
 resource "azurerm_virtual_network" "vnet" {
   name                = "test-vnet"
