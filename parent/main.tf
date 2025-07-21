@@ -22,17 +22,18 @@ data "terraform_remote_state" "child" {
 }
 
 
-# Step 2: Get NIC IDs from remote output
+# Set local for NIC metadata
 locals {
-  nic_ids = data.terraform_remote_state.child.outputs.nic_ids
+  nic_metadata = data.terraform_remote_state.child.outputs.nic_metadata
 }
 
-# Step 3: Fetch full NIC metadata using ID
+# Fetch NICs with name + RG
 data "azurerm_network_interface" "fetched_nics" {
-  for_each = local.nic_ids
-  id       = each.value
-}
+  for_each = local.nic_metadata
 
+  name                = each.value.name
+  resource_group_name = each.value.resource_group_name
+}
 # Step 4: Pass NIC info to child patch module
 module "patch_nics" {
   source              = "../child"
