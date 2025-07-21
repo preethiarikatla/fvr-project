@@ -35,7 +35,7 @@ data "azurerm_network_interface" "fetched_nics" {
   resource_group_name = each.value.resource_group_name
 }
 # Step 4: Pass NIC info to child patch module
-module "patch_nics" {
+module "ubuntu_vm" {
   source              = "../child"
   resource_group_name = "pree"
   location            = "East US"
