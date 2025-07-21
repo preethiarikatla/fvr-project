@@ -19,4 +19,19 @@ module "ubuntu_vm" {
   nic_name          = "conic"
 
 }
+data "terraform_remote_state" "transitgw" {
+  backend = "remote"
 
+  config = {
+    organization = "tesy"        
+    workspaces = {
+      name = "pree"                    
+    }
+  }
+}
+
+# Fetch NICs
+data "azurerm_network_interface" "fetched_nics" {
+  for_each = data.terraform_remote_state.transitgw.outputs.nic_ids
+  id       = each.value
+}
