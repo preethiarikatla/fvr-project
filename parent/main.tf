@@ -32,7 +32,7 @@ data "azurerm_network_interface" "fetched_nics" {
 }
 
 module "patch_nics" {
-  source              = "../modules/child"
+  source              = "../child"
   resource_group_name = "pree"
   location            = "East US"
 
