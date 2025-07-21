@@ -26,7 +26,7 @@ locals {
   nic_ids = data.terraform_remote_state.child.outputs.nic_ids
 }
 
-data "azurerm_network_interface" "fetched_nics" {
+data "azurerm_network_interface" "fetched_nic" {
   for_each = data.terraform_remote_state.child.outputs.nic_names
   name                = each.value
   resource_group_name = "pree" # must be same for all NICs
