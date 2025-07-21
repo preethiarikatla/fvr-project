@@ -16,7 +16,7 @@ data "terraform_remote_state" "child" {
   config = {
     organization = "tesy"        
     workspaces = {
-      name = "pree"                    
+      name = "pre"                    
     }
   }
 }
