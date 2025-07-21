@@ -15,8 +15,8 @@ module "ubuntu_vm" {
   source            = "../child"
   resource_group_name = "pree"
   location          = "East US"
-  vm_name           = "copilot-test-vm-v2"
+
   nic_name          = "conic"
-  public_ip_name    = "gigy"
+
 }
 
