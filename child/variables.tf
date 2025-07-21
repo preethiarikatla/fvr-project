@@ -1,6 +1,6 @@
 variable "resource_group_name" {}
 variable "location" {}
-variable "nic_name" {}
+
 variable "egress_nic_names" {
   type = map(string)
 }
