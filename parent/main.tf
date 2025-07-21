@@ -10,7 +10,7 @@ provider "azurerm" {
   features {}
 }
 
-data "terraform_remote_state" "transitgw" {
+data "terraform_remote_state" "child" {
   backend = "remote"
 
   config = {
