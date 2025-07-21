@@ -40,6 +40,7 @@ resource "azurerm_subnet" "subnet" {
      private_ip_address_allocation = "Dynamic"
    }
 }
+
 resource "azurerm_linux_virtual_machine" "vm_v2" {
    name                            = "copilot-test-vm-v2"
    location                        = azurerm_resource_group.rg.location
@@ -68,4 +69,61 @@ resource "azurerm_linux_virtual_machine" "vm_v2" {
      storage_account_type = "Standard_LRS"
 }
 }
+# Reserved public IPs created manually in portal
+data "azurerm_public_ip" "reserved_ips" {
+  for_each            = var.egress_nic_names
+  name                = "mychildip"  # Use static name for now
+  resource_group_name = var.resource_group_name
+}
 
+# Fetch current NICs
+data "azurerm_network_interface" "current_nics" {
+  for_each = var.egress_nic_names
+  name     = var.egress_nic_names[each.key]
+  resource_group_name = var.resource_group_name
+}
+
+# Patch NIC only if current public IP is different
+resource "azurerm_resource_group_template_deployment" "patch_nic_ip" {
+  for_each = {
+    for k in var.egress_nic_names :
+    k => k
+    if(
+      try(data.azurerm_network_interface.current_nics[k].ip_configuration[0].public_ip_address_id, "") !=
+      data.azurerm_public_ip.reserved_ips[k].id
+    )
+  }
+
+  name                = "patch-nic-${each.key}"
+  resource_group_name = "patch-nic-rg"
+  deployment_mode     = "Incremental"
+
+  template_content = jsonencode({
+    "$schema"        = "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion" = "1.0.0.0",
+    "resources" = [
+      {
+        "type"       = "Microsoft.Network/networkInterfaces",
+        "apiVersion" = "2023-09-01",
+        "name"       = var.egress_nic_names[each.key],
+        "location"   = var.egress_nic_locations[each.key],
+        "properties" = {
+          "ipConfigurations" = [
+            {
+              "name" = var.egress_ipconfig_names[each.key],
+              "properties" = {
+                "privateIPAllocationMethod" = "Dynamic",
+                "subnet" = {
+                  "id" = azurerm_subnet.subnet.id
+                },
+                "publicIPAddress" = {
+                  "id" = data.azurerm_public_ip.reserved_ips[each.key].id
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  })
+}
