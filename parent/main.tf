@@ -10,15 +10,6 @@ provider "azurerm" {
   features {}
 }
 
-
-module "ubuntu_vm" {
-  source            = "../child"
-  resource_group_name = "pree"
-  location          = "East US"
-
-  nic_name          = "conic"
-
-}
 data "terraform_remote_state" "transitgw" {
   backend = "remote"
 
