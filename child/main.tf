@@ -30,7 +30,7 @@ resource "azurerm_subnet" "subnet" {
   address_prefixes     = ["10.0.1.0/24"]
 }
  resource "azurerm_network_interface" "nic" {
-  name                = var.nic_name
+  name                = "conic"
   location            = var.location
   resource_group_name = var.resource_group_name
  
