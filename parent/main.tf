@@ -10,48 +10,101 @@ provider "azurerm" {
   features {}
 }
 
-
-# Step 4: Pass NIC info to child patch module
-module "ubuntu_vm" {
-  source              = "../child"
-  resource_group_name = "pree"
-  location            = "East US"
-  egress_nic_names = {
-    for k, nic in data.azurerm_network_interface.fetched_nics : k => nic.name
-  }
-
-  egress_nic_locations = {
-    for k, nic in data.azurerm_network_interface.fetched_nics : k => nic.location
-  }
-
-  egress_ipconfig_names = {
-    for k, nic in data.azurerm_network_interface.fetched_nics : k => nic.ip_configuration[0].name
-  }
-
-  egress_subnet_ids = {
-    for k, nic in data.azurerm_network_interface.fetched_nics : k => nic.ip_configuration[0].subnet_id
-  }
-
+resource "azurerm_resource_group" "test" {
+  name     = "rg-nic-test"
+  location = "East US"
 }
-# ✅ Fetch remote state from Terraform Cloud
-data "terraform_remote_state" "child" {
-  backend = "remote"
-  config = {
-    organization = "tesy"
-    workspaces = {
-      name = "pre"
+
+resource "azurerm_virtual_network" "vnet" {
+  name                = "vnet-nic-test"
+  address_space       = ["10.0.0.0/16"]
+  location            = azurerm_resource_group.test.location
+  resource_group_name = azurerm_resource_group.test.name
+}
+
+resource "azurerm_subnet" "subnet" {
+  name                 = "subnet-test"
+  resource_group_name  = azurerm_resource_group.test.name
+  virtual_network_name = azurerm_virtual_network.vnet.name
+  address_prefixes     = ["10.0.1.0/24"]
+}
+#
+
+# Public IPs (simulated reserved IPs)
+resource "azurerm_public_ip" "reserved" {
+  for_each = toset(["fw1", "fw2"])
+
+  name                = "avx-eastus-pa-${each.key}-pip"
+  location            = azurerm_resource_group.test.location
+  resource_group_name = azurerm_resource_group.test.name
+  allocation_method   = "Static"
+  sku                 = "Standard"
+}
+
+# NICs that may or may not match the reserved IPs
+resource "azurerm_network_interface" "nic" {
+  for_each = toset(["fw1", "fw2"])
+
+  name                = "${each.key}-nic"
+  location            = azurerm_resource_group.test.location
+  resource_group_name = azurerm_resource_group.test.name
+
+  ip_configuration {
+    name                          = "ipconfig1"
+    subnet_id                     = azurerm_subnet.subnet.id
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.reserved[each.key].id # For testing, set correctly
+  }
+}
+
+resource "azurerm_resource_group_template_deployment" "patch_nic" {
+  for_each = {
+    for key in ["fw1", "fw2"] :
+    key => azurerm_network_interface.nic[key]
+    if true
+  }
+
+  name                = "patch-${each.key}-egress"
+  resource_group_name = azurerm_resource_group.test.name
+  deployment_mode     = "Incremental"
+
+  template_content = <<JSON
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "nicName": { "type": "string" },
+    "publicIPId": { "type": "string" },
+    "subnetId": { "type": "string" }
+  },
+  "resources": [{
+    "type": "Microsoft.Network/networkInterfaces",
+    "apiVersion": "2020-11-01",
+    "name": "[parameters('nicName')]",
+    "properties": {
+      "ipConfigurations": [{
+        "name": "ipconfig1",
+        "properties": {
+          "subnet": { "id": "[parameters('subnetId')]" },
+          "publicIPAddress": { "id": "[parameters('publicIPId')]" }
+        }
+      }]
     }
-  }
+  }]
 }
+JSON
 
-# ✅ Extract NIC IDs as map from child outputs
-locals {
-  nic_ids = data.terraform_remote_state.child.outputs.nic_ids
+  parameters_content = jsonencode({
+    nicName = {
+      value = each.value.name
+    }
+    publicIPId = {
+      value = azurerm_public_ip.reserved[each.key].id
+    }
+    subnetId = {
+      value = azurerm_subnet.subnet.id
+    }
+  })
+
+  depends_on = [azurerm_network_interface.nic]
 }
-
-# ✅ Use those NIC IDs to fetch full NIC metadata
-data "azurerm_network_interface" "fetched_nics" {
-  for_each = local.nic_ids
-  id       = each.value
-}
-
