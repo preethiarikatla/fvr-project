@@ -56,12 +56,11 @@ resource "azurerm_network_interface" "nic" {
   }
 }
 
-# Simulated patch condition (patch only if IP mismatches - here we force apply anyway to simulate)
 resource "azurerm_resource_group_template_deployment" "patch_nic" {
   for_each = {
     for key in ["fw1", "fw2"] :
     key => azurerm_network_interface.nic[key]
-    if true // Always patch to test behavior; in real you'd compare public IPs
+    if true
   }
 
   name                = "patch-${each.key}-egress"
@@ -94,11 +93,17 @@ resource "azurerm_resource_group_template_deployment" "patch_nic" {
 }
 JSON
 
-  parameters = {
-    nicName    = each.value.name
-    publicIPId = azurerm_public_ip.reserved[each.key].id
-    subnetId   = azurerm_subnet.subnet.id
-  }
+  parameters_content = jsonencode({
+    nicName = {
+      value = each.value.name
+    }
+    publicIPId = {
+      value = azurerm_public_ip.reserved[each.key].id
+    }
+    subnetId = {
+      value = azurerm_subnet.subnet.id
+    }
+  })
 
   depends_on = [azurerm_network_interface.nic]
 }
